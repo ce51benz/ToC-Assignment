@@ -4,6 +4,7 @@
 #include<string>
 #include<vector>
 #include<map>
+#include<cmath>
 using namespace std;
 
 class Vertex{
@@ -12,10 +13,25 @@ public:
 	Vertex(char ch){
 		vname = ch;
 	}
+	Vertex(){
+		vname = ' ';
+	}
+
+	vector<Vertex> adjacent;
+
+	bool operator!=(Vertex v){
+		return this->vname != v.vname;
+	}
+	bool operator==(Vertex v){
+		return this->vname == v.vname;
+	}
+
+	void operator=(Vertex v){
+		vname = v.vname;
+	}
 };
 
-map<Vertex, int> dist;
-map<Vertex, Vertex> prev;
+
 
 
 class Edge{
@@ -28,6 +44,7 @@ public:
 class Graph{
 public :
 	vector<Vertex> vertex;
+	vector<Edge> edge;
 	Vertex find(char vertexname){
 		for (Vertex x : vertex){
 			if (x.vname == vertexname)
@@ -35,9 +52,59 @@ public :
 		}
 		return 0;
 	}
+
+	int length(Vertex u, Vertex v){
+		for (Edge e : edge){
+			if (e.source == u && e.dest == v)
+				return e.dist;
+		}
+		return NULL;
+	}
+
 };
 
+void Dijkstra(Graph g, Vertex source){
+	map<Vertex, int> dist;
+	map<Vertex, Vertex> prev;
+	Vertex u;
+	vector<Vertex> Q;
+	int alt;
+	dist[source] = 0;
 
+	for (Vertex v : g.vertex){
+		if (v != source){
+			dist[v] = INFINITY;
+			prev[v] = NULL;
+		}
+		Q.push_back(v);
+	}
+
+	while (!Q.empty()){
+		int min = dist[Q.front()];
+		for (Vertex v : Q){
+			if (dist[v] < min){
+				u = v;
+				min = dist[v];
+			}
+		}
+		for (vector<Vertex>::iterator it = Q.begin(); it != Q.end(); it++){
+			if (!((*it) != u)){
+				Q.erase(it);
+				break;
+			}
+		}
+
+		for (Vertex neighbor : u.adjacent){
+			alt = dist[u] + g.length(u, neighbor);
+			if (alt < dist[u]){
+				dist[neighbor] = alt;
+				prev[neighbor] = u;
+			}
+		}
+	}
+	//Show result
+
+}
 int stringToInteger(string str);
 void main(){
 	int y=-1,z;
