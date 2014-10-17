@@ -29,6 +29,10 @@ public:
 	void operator=(Vertex v){
 		vname = v.vname;
 	}
+
+	bool operator<(Vertex v)const{
+		return vname < v.vname;
+	}
 };
 
 
@@ -64,11 +68,11 @@ public :
 };
 
 void Dijkstra(Graph g, Vertex source){
-	map<Vertex, int> dist;
+	map<Vertex, float> dist;
 	map<Vertex, Vertex> prev;
 	Vertex u;
 	vector<Vertex> Q;
-	int alt;
+	float alt;
 	dist[source] = 0;
 
 	for (Vertex v : g.vertex){
@@ -80,7 +84,7 @@ void Dijkstra(Graph g, Vertex source){
 	}
 
 	while (!Q.empty()){
-		int min = dist[Q.front()];
+		float min = dist[Q.front()];
 		for (Vertex v : Q){
 			if (dist[v] < min){
 				u = v;
