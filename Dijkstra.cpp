@@ -6,7 +6,9 @@
 #include<map>
 #include<cmath>
 using namespace std;
-
+//Convert string to integer by use inputstream to convert.
+int stringToInteger(string str);
+void reverseString(string &str);
 class Vertex{
 public:
 	char vname;
@@ -28,15 +30,15 @@ public:
 
 	void operator=(Vertex v){
 		vname = v.vname;
+		adjacent.clear();
+		for (Vertex newvt : v.adjacent)
+			adjacent.push_back(newvt);
 	}
 
 	bool operator<(Vertex v)const{
 		return vname < v.vname;
 	}
 };
-
-
-
 
 class Edge{
 public:
@@ -46,7 +48,7 @@ public:
 };
 
 class Graph{
-public :
+public:
 	vector<Vertex> vertex;
 	vector<Edge> edge;
 	Vertex find(char vertexname){
@@ -54,7 +56,7 @@ public :
 			if (x.vname == vertexname)
 				return x;
 		}
-		return 0;
+		return NULL;
 	}
 
 	int length(Vertex u, Vertex v){
@@ -67,7 +69,8 @@ public :
 
 };
 
-void Dijkstra(Graph g, Vertex source){
+void Dijkstra(Graph g, Vertex source,Vertex dest){
+	string path;
 	map<Vertex, float> dist;
 	map<Vertex, Vertex> prev;
 	Vertex u;
@@ -85,12 +88,15 @@ void Dijkstra(Graph g, Vertex source){
 
 	while (!Q.empty()){
 		float min = dist[Q.front()];
+		u = Q.front();
 		for (Vertex v : Q){
 			if (dist[v] < min){
 				u = v;
 				min = dist[v];
 			}
 		}
+
+		//Remove vertex from Q
 		for (vector<Vertex>::iterator it = Q.begin(); it != Q.end(); it++){
 			if (!((*it) != u)){
 				Q.erase(it);
@@ -98,24 +104,40 @@ void Dijkstra(Graph g, Vertex source){
 			}
 		}
 
+		if (u == dest){
+			path = "";
+			cout << "You passed:";
+			path = path + u.vname + " ";
+			while (prev[u] != source){
+				path = path + prev[u].vname + " ";
+				u = prev[u];
+			}
+			path = path + prev[u].vname;
+			reverseString(path);
+			cout << path << endl;
+			cout << "Distance from " << source.vname << " to " << dest.vname << " = " << dist[dest] << endl;
+			break;
+		}
+		cout << "Passed:" << u.vname <<" Dist["<<u.vname<<"] = "<<dist[u]<< endl;
 		for (Vertex neighbor : u.adjacent){
 			alt = dist[u] + g.length(u, neighbor);
-			if (alt < dist[u]){
+			if (alt < dist[neighbor]){
 				dist[neighbor] = alt;
 				prev[neighbor] = u;
 			}
+			cout << "Dist[" << neighbor.vname << "] = " << dist[neighbor] << endl;
 		}
+		cout << "========================"<<endl;
 	}
-	//Show result
-
 }
-int stringToInteger(string str);
+
+
 void main(){
 	int row=-1,col,weight;
-	int graph[12][12];
 	ifstream infile;
 	string str,input;
-	Graph g;
+	char s,d;
+	Graph graph;
 	infile.open("graphTOC.csv");
 	if (infile.fail())
 		cerr << "Fail to open file.";
@@ -131,11 +153,11 @@ void main(){
 				//Also add adjacent vertex to source vertex.
 				if (weight > 0){
 					Edge e;
-					e.source = g.vertex[row];
-					e.dest = g.vertex[col];
+					e.source = graph.vertex[row];
+					e.dest = graph.vertex[col];
 					e.dist = weight;
-					g.edge.push_back(e);
-					g.vertex[row].adjacent.push_back(g.vertex[col]);
+					graph.edge.push_back(e);
+					graph.vertex[row].adjacent.push_back(graph.vertex[col]);
 				}
 				col++;
 			}
@@ -143,29 +165,42 @@ void main(){
 			//If alphabet is read,create Vertex and add it to graph.
 			else if (isalpha(str[i])){
 				Vertex r(str[i]);
-				g.vertex.push_back(r);
+				graph.vertex.push_back(r);
 			}
 		}
 			row++;
 	}
-	for (vector<Vertex>::iterator it = g.vertex.begin(); it != g.vertex.end(); it++)
+	/*for (vector<Vertex>::iterator it = graph.vertex.begin(); it != graph.vertex.end(); it++)
 		cout << (*it).vname << ' ';
 	cout << endl;
 
-	for (Vertex v : g.vertex){
+	for (Vertex v : graph.vertex){
 		cout << "Adjacent of " << v.vname << " is ";
 		for (Vertex u : v.adjacent)
 			cout << u.vname << " ";
 		cout << endl<<endl;
 	}
 
-	for (Edge path : g.edge){
+	for (Edge path : graph.edge){
 		cout << "Source:" << path.source.vname << endl;
 		cout << "Dest:" << path.dest.vname << endl;
 		cout << "Weight:" << path.dist << endl;
 		cout << "==========================" << endl;
 
+	}*/
+	while (true)
+	{
+		cout << "Enter source vertex:";
+		cin >> s;
+		cout << "Enter destination vertex:";
+		cin >> d;
+		if (graph.find(s) == NULL || graph.find(d) == NULL)
+			cerr << "Input vertex incorrect,please try again.";
+		else
+			break;
 	}
+
+	Dijkstra(graph, graph.find(s), graph.find(d));
 
 	infile.close();
 }
@@ -175,7 +210,18 @@ int stringToInteger(string str){
 	istringstream stream(str);
 	int value;
 	stream >> value;
-	if (stream.fail() || !stream.eof())
+	if (stream.fail() || !stream.eof()){
 		cout << "error!!!" << endl;
+		return NULL;
+	}
 	return value;
+}
+
+void reverseString(string &str){
+	string reverse = "";
+	if (str != ""){
+		for (int i = str.length() - 1; i >= 0; i--)
+			reverse = reverse + str[i];
+	}
+	str = reverse;
 }
