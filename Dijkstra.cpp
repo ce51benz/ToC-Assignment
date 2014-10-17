@@ -111,7 +111,7 @@ void Dijkstra(Graph g, Vertex source){
 }
 int stringToInteger(string str);
 void main(){
-	int y=-1,z;
+	int row=-1,col,weight;
 	int graph[12][12];
 	ifstream infile;
 	string str,input;
@@ -120,29 +120,53 @@ void main(){
 	if (infile.fail())
 		cerr << "Fail to open file.";
 	while (!infile.eof()){
-		z = 0;
+		col = 0;
 		infile >> str;
 		for (int i = 0; i < str.length(); i++){
 			if (!isalpha(str[i]) && !ispunct(str[i])){
 				input = "";
 				input = input + str[i];
-				graph[y][z++] = stringToInteger(input);
+				weight = stringToInteger(input);
+				//If weight is not zero create edge and add it to graph.
+				//Also add adjacent vertex to source vertex.
+				if (weight > 0){
+					Edge e;
+					e.source = g.vertex[row];
+					e.dest = g.vertex[col];
+					e.dist = weight;
+					g.edge.push_back(e);
+					g.vertex[row].adjacent.push_back(g.vertex[col]);
+				}
+				col++;
 			}
+
+			//If alphabet is read,create Vertex and add it to graph.
 			else if (isalpha(str[i])){
 				Vertex r(str[i]);
 				g.vertex.push_back(r);
 			}
 		}
-		y++;
+			row++;
 	}
 	for (vector<Vertex>::iterator it = g.vertex.begin(); it != g.vertex.end(); it++)
 		cout << (*it).vname << ' ';
 	cout << endl;
-	for (int i = 0; i < 12; i++){
-		for (int j = 0; j < 12; j++)
-			cout << graph[i][j] << " ";
-		cout << endl;
+
+	for (Vertex v : g.vertex){
+		cout << "Adjacent of " << v.vname << " is ";
+		for (Vertex u : v.adjacent)
+			cout << u.vname << " ";
+		cout << endl<<endl;
 	}
+
+	for (Edge path : g.edge){
+		cout << "Source:" << path.source.vname << endl;
+		cout << "Dest:" << path.dest.vname << endl;
+		cout << "Weight:" << path.dist << endl;
+		cout << "==========================" << endl;
+
+	}
+
 	infile.close();
 }
 
