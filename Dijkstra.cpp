@@ -5,6 +5,12 @@
 #include<vector>
 #include<map>
 #include<cmath>
+
+//Things to do
+//1.Tell path of sub path before reach destination
+//2.Detect error from read file
+//3.Multi weight read value
+
 using namespace std;
 //Convert string to integer by use inputstream to convert.
 int stringToInteger(string str);
@@ -86,6 +92,12 @@ void Dijkstra(Graph g, Vertex source,Vertex dest){
 		Q.push_back(v);
 	}
 
+	//Display initialized value
+	cout << "[Initialized]" << endl;
+	for (Vertex v : Q)
+		cout << "Dist[" << v.vname << "] = " << dist[v] << endl;
+	cout << endl;
+	cout << "[Evaluate]" << endl;
 	while (!Q.empty()){
 		float min = dist[Q.front()];
 		u = Q.front();
@@ -103,32 +115,37 @@ void Dijkstra(Graph g, Vertex source,Vertex dest){
 				break;
 			}
 		}
-
-		if (u == dest){
-			path = "";
-			cout << "You passed:";
-			path = path + u.vname + " ";
-			while (prev[u] != source){
-				path = path + prev[u].vname + " ";
-				u = prev[u];
-			}
-			path = path + prev[u].vname;
-			reverseString(path);
-			cout << path << endl;
-			cout << "Distance from " << source.vname << " to " << dest.vname << " = " << dist[dest] << endl;
-			break;
-		}
-		cout << "Passed:" << u.vname <<" Dist["<<u.vname<<"] = "<<dist[u]<< endl;
+		//Display evalutate path in each visit.
+		cout << "Visit:" << u.vname <<" ,Dist["<<u.vname<<"] = "<<dist[u]<< endl;
 		for (Vertex neighbor : u.adjacent){
 			alt = dist[u] + g.length(u, neighbor);
 			if (alt < dist[neighbor]){
 				dist[neighbor] = alt;
 				prev[neighbor] = u;
-			}
-			cout << "Dist[" << neighbor.vname << "] = " << dist[neighbor] << endl;
+			}	
 		}
+		cout << "Evaluate distance of remain unvisited vertexes." << endl;
+		for (Vertex v:Q)
+			cout << "Dist[" << v.vname << "] = " << dist[v] << endl;
 		cout << "========================"<<endl;
 	}
+
+	//Display shortest path result.
+	path = "";
+	cout <<"[Finished]" << endl;
+	cout << "Shortest path is:";
+	path = path + dest.vname + " ";
+	Vertex v = dest;
+	while (prev[v] != source){
+		path = path + prev[v].vname + " ";
+		v = prev[v];
+	}
+	path = path + prev[v].vname;
+	reverseString(path);
+	cout << path << endl;
+	cout << "Distance from " << source.vname << " to " << dest.vname << " = " << dist[dest] << endl;
+
+
 }
 
 
@@ -141,6 +158,8 @@ void main(){
 	infile.open("graphTOC.csv");
 	if (infile.fail())
 		cerr << "Fail to open file.";
+
+	//Read file and initialize graph.
 	while (!infile.eof()){
 		col = 0;
 		infile >> str;
@@ -186,8 +205,11 @@ void main(){
 		cout << "Dest:" << path.dest.vname << endl;
 		cout << "Weight:" << path.dist << endl;
 		cout << "==========================" << endl;
-
 	}*/
+	cout << "KMITL TOC1/2557 Assignment 1 Dijkstra's Algorithm" << endl;
+	cout << "[Member]" << endl;
+	cout << "1.Maturose Kappako\t55010977" << endl;
+	cout << "2.Suratchanan Kraidech\t55011362" << endl<<endl;
 	while (true)
 	{
 		cout << "Enter source vertex:";
@@ -199,7 +221,7 @@ void main(){
 		else
 			break;
 	}
-
+	cout << endl;
 	Dijkstra(graph, graph.find(s), graph.find(d));
 
 	infile.close();
