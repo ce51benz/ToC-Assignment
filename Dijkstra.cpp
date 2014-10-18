@@ -7,7 +7,7 @@
 #include<cmath>
 
 //Things to do
-//1.Tell path of sub path before reach destination
+//1.Detect not graph creation.
 //2.Detect error from read file
 //3.Multi weight read value
 
@@ -74,6 +74,7 @@ public:
 	}
 
 };
+bool isValidGraph(Graph &g);
 void displayPath(map<Vertex, Vertex>&prev, Vertex source, Vertex v, string &path, bool includeFinal);
 void Dijkstra(Graph g, Vertex source,Vertex dest){
 	string path;
@@ -155,6 +156,10 @@ void main(){
 	string str,input;
 	char s,d;
 	Graph graph;
+	cout << "KMITL TOC1/2557 Assignment 1 Dijkstra's Algorithm" << endl;
+	cout << "[Member]" << endl;
+	cout << "1.Maturose Kappako\t55010977" << endl;
+	cout << "2.Suratchanan Kraidech\t55011362" << endl << endl;
 	infile.open("graphTOC.csv");
 	if (infile.fail())
 		cerr << "Fail to open file.";
@@ -163,6 +168,7 @@ void main(){
 	while (!infile.eof()){
 		col = 0;
 		infile >> str;
+		if (infile.eof())break;
 		for (int i = 0; i < str.length(); i++){
 			if (!isalpha(str[i]) && !ispunct(str[i])){
 				input = "";
@@ -206,24 +212,24 @@ void main(){
 		cout << "Weight:" << path.dist << endl;
 		cout << "==========================" << endl;
 	}*/
-	cout << "KMITL TOC1/2557 Assignment 1 Dijkstra's Algorithm" << endl;
-	cout << "[Member]" << endl;
-	cout << "1.Maturose Kappako\t55010977" << endl;
-	cout << "2.Suratchanan Kraidech\t55011362" << endl<<endl;
-	while (true)
-	{
-		cout << "Enter source vertex:";
-		cin >> s;
-		cout << "Enter destination vertex:";
-		cin >> d;
-		if (graph.find(s) == NULL || graph.find(d) == NULL)
-			cerr << "Input vertex incorrect,please try again.";
-		else
-			break;
+	if (!isValidGraph(graph)){
+		cout << "This graph is invaild,please use proper adjacency matrix to represent!!!" << endl;
 	}
-	cout << endl;
-	Dijkstra(graph, graph.find(s), graph.find(d));
-
+	else{
+		while (true)
+		{
+			cout << "Enter source vertex:";
+			cin >> s;
+			cout << "Enter destination vertex:";
+			cin >> d;
+			if (graph.find(s) == NULL || graph.find(d) == NULL)
+				cerr << "Input vertex incorrect,please try again.";
+			else
+				break;
+		}
+		cout << endl;
+		Dijkstra(graph, graph.find(s), graph.find(d));
+	}
 	infile.close();
 }
 
@@ -246,6 +252,15 @@ void displayPath(map<Vertex, Vertex>&prev, Vertex source, Vertex v, string &path
 	cout << path << endl;
 }
 
+//This function use to check whether perferred graph is proper graph or not.
+bool isValidGraph(Graph &g){
+	int oddVertexCount = 0;
+	for (Vertex v : g.vertex){
+		if (v.adjacent.size() % 2 != 0)
+			oddVertexCount++;
+	}
+	return oddVertexCount % 2 == 0;
+}
 
 int stringToInteger(string str){
 	istringstream stream(str);
