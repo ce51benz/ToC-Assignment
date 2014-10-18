@@ -74,7 +74,8 @@ public:
 	}
 
 };
-bool isValidGraph(Graph &g);
+void initialized(Graph &graph);
+bool isValidGraph(Graph &graph);
 void displayPath(map<Vertex, Vertex>&prev, Vertex source, Vertex v, string &path, bool includeFinal);
 void Dijkstra(Graph g, Vertex source,Vertex dest){
 	string path;
@@ -151,50 +152,15 @@ void Dijkstra(Graph g, Vertex source,Vertex dest){
 
 
 void main(){
-	int row=-1,col,weight;
-	ifstream infile;
-	string str,input;
 	char s,d;
 	Graph graph;
 	cout << "KMITL TOC1/2557 Assignment 1 Dijkstra's Algorithm" << endl;
 	cout << "[Member]" << endl;
 	cout << "1.Maturose Kappako\t55010977" << endl;
 	cout << "2.Suratchanan Kraidech\t55011362" << endl << endl;
-	infile.open("graphTOC.csv");
-	if (infile.fail())
-		cerr << "Fail to open file.";
-
-	//Read file and initialize graph.
-	while (!infile.eof()){
-		col = 0;
-		infile >> str;
-		if (infile.eof())break;
-		for (int i = 0; i < str.length(); i++){
-			if (!isalpha(str[i]) && !ispunct(str[i])){
-				input = "";
-				input = input + str[i];
-				weight = stringToInteger(input);
-				//If weight is not zero create edge and add it to graph.
-				//Also add adjacent vertex to source vertex.
-				if (weight > 0){
-					Edge e;
-					e.source = graph.vertex[row];
-					e.dest = graph.vertex[col];
-					e.dist = weight;
-					graph.edge.push_back(e);
-					graph.vertex[row].adjacent.push_back(graph.vertex[col]);
-				}
-				col++;
-			}
-
-			//If alphabet is read,create Vertex and add it to graph.
-			else if (isalpha(str[i])){
-				Vertex r(str[i]);
-				graph.vertex.push_back(r);
-			}
-		}
-			row++;
-	}
+	
+	//Initialized graph from adjacency matrix file.
+	initialized(graph);
 	/*for (vector<Vertex>::iterator it = graph.vertex.begin(); it != graph.vertex.end(); it++)
 		cout << (*it).vname << ' ';
 	cout << endl;
@@ -230,7 +196,6 @@ void main(){
 		cout << endl;
 		Dijkstra(graph, graph.find(s), graph.find(d));
 	}
-	infile.close();
 }
 
 //This function use for display path from source to destination.
@@ -253,13 +218,56 @@ void displayPath(map<Vertex, Vertex>&prev, Vertex source, Vertex v, string &path
 }
 
 //This function use to check whether perferred graph is proper graph or not.
-bool isValidGraph(Graph &g){
+bool isValidGraph(Graph &graph){
 	int oddVertexCount = 0;
-	for (Vertex v : g.vertex){
+	for (Vertex v : graph.vertex){
 		if (v.adjacent.size() % 2 != 0)
 			oddVertexCount++;
 	}
 	return oddVertexCount % 2 == 0;
+}
+
+//Initialized graph from adjacency matrix file.
+void initialized(Graph &graph){
+	int row = -1, col, weight;
+	ifstream infile;
+	string str, input;
+	infile.close();
+	infile.open("graphTOC.csv");
+	if (infile.fail())
+		cerr << "Fail to open file.";
+
+	//Read file and initialize graph.
+	while (!infile.eof()){
+		col = 0;
+		infile >> str;
+		if (infile.eof())break;
+		for (int i = 0; i < str.length(); i++){
+			if (!isalpha(str[i]) && !ispunct(str[i])){
+				input = "";
+				input = input + str[i];
+				weight = stringToInteger(input);
+				//If weight is not zero create edge and add it to graph.
+				//Also add adjacent vertex to source vertex.
+				if (weight > 0){
+					Edge e;
+					e.source = graph.vertex[row];
+					e.dest = graph.vertex[col];
+					e.dist = weight;
+					graph.edge.push_back(e);
+					graph.vertex[row].adjacent.push_back(graph.vertex[col]);
+				}
+				col++;
+			}
+
+			//If alphabet is read,create Vertex and add it to graph.
+			else if (isalpha(str[i])){
+				Vertex r(str[i]);
+				graph.vertex.push_back(r);
+			}
+		}
+		row++;
+	}
 }
 
 int stringToInteger(string str){
