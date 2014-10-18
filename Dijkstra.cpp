@@ -67,14 +67,28 @@ public:
 
 	int length(Vertex u, Vertex v){
 		for (Edge e : edge){
-			if (e.source == u && e.dest == v)
+			if ((e.source == u && e.dest == v) || (e.source == v && e.dest == u))
 				return e.dist;
 		}
 		return NULL;
 	}
-
+	bool addEdge(Edge edgeToAdd){
+		for (Edge e : edge){
+			if ((e.source == edgeToAdd.source && e.dest == edgeToAdd.dest) ||
+				(e.source == edgeToAdd.dest && e.dest == edgeToAdd.source)){
+				if (e.dist != edgeToAdd.dist){
+					cerr << "Edge check error!!!" <<endl << "The adjacency matrix's weight of edge is not match."<<endl;
+					return false;
+				}
+				else
+					return true;
+			}
+		}
+		edge.push_back(edgeToAdd);
+		return true;
+	}
 };
-void initialized(Graph &graph);
+bool initialized(Graph &graph);
 bool isValidGraph(Graph &graph);
 void displayPath(map<Vertex, Vertex>&prev, Vertex source, Vertex v, string &path, bool includeFinal);
 void Dijkstra(Graph g, Vertex source,Vertex dest){
@@ -146,12 +160,10 @@ void Dijkstra(Graph g, Vertex source,Vertex dest){
 	cout << "Shortest path is:";
 	displayPath(prev, source, dest, path, true);
 	cout << "Distance from " << source.vname << " to " << dest.vname << " = " << dist[dest] << endl;
-
-
 }
 
 
-void main(){
+int main(){
 	char s,d;
 	Graph graph;
 	cout << "KMITL TOC1/2557 Assignment 1 Dijkstra's Algorithm" << endl;
@@ -160,7 +172,11 @@ void main(){
 	cout << "2.Suratchanan Kraidech\t55011362" << endl << endl;
 	
 	//Initialized graph from adjacency matrix file.
-	initialized(graph);
+	//If initialized is false program will terminate here.
+	if (!initialized(graph)){
+		return 0;
+	}
+
 	/*for (vector<Vertex>::iterator it = graph.vertex.begin(); it != graph.vertex.end(); it++)
 		cout << (*it).vname << ' ';
 	cout << endl;
@@ -196,6 +212,7 @@ void main(){
 		cout << endl;
 		Dijkstra(graph, graph.find(s), graph.find(d));
 	}
+	return 0;
 }
 
 //This function use for display path from source to destination.
@@ -224,28 +241,51 @@ bool isValidGraph(Graph &graph){
 		if (v.adjacent.size() % 2 != 0)
 			oddVertexCount++;
 	}
-	return oddVertexCount % 2 == 0;
+	return oddVertexCount % 2 == 0 && graph.vertex.size() != 0;
 }
 
 //Initialized graph from adjacency matrix file.
-void initialized(Graph &graph){
-	int row = -1, col, weight;
+bool initialized(Graph &graph){
+	int row = 0, col, weight;
 	ifstream infile;
 	string str, input;
+	int shift;
 	infile.close();
 	infile.open("graphTOC.csv");
-	if (infile.fail())
-		cerr << "Fail to open file.";
+	if (infile.fail()){
+		cerr << "Fail to open file."<<endl;
+		return false;
+	}
 
+	//Read first line to create vertex and add it to graph.
+	if (!infile.eof()){
+		infile >> str;
+		for (int i = 0; i < str.length(); i++){
+			if (!ispunct(str[i])){
+				Vertex r(str[i]);
+				graph.vertex.push_back(r);
+			}
+		}
+	}
 	//Read file and initialize graph.
 	while (!infile.eof()){
 		col = 0;
 		infile >> str;
 		if (infile.eof())break;
-		for (int i = 0; i < str.length(); i++){
-			if (!isalpha(str[i]) && !ispunct(str[i])){
-				input = "";
-				input = input + str[i];
+		int i = 0;
+		while (i < str.length()){
+			input = "";
+			shift = 1;
+			if (!ispunct(str[i])){
+				int j = i + 1;
+				while (j < str.length()){
+					if (!ispunct(str[j])){
+						shift++; j++;
+					}
+					else
+						break;
+				}
+				input = input + str.substr(i, shift);
 				weight = stringToInteger(input);
 				//If weight is not zero create edge and add it to graph.
 				//Also add adjacent vertex to source vertex.
@@ -254,20 +294,17 @@ void initialized(Graph &graph){
 					e.source = graph.vertex[row];
 					e.dest = graph.vertex[col];
 					e.dist = weight;
-					graph.edge.push_back(e);
+					if (!graph.addEdge(e))
+						return false;
 					graph.vertex[row].adjacent.push_back(graph.vertex[col]);
 				}
 				col++;
 			}
-
-			//If alphabet is read,create Vertex and add it to graph.
-			else if (isalpha(str[i])){
-				Vertex r(str[i]);
-				graph.vertex.push_back(r);
-			}
+			i += shift;
 		}
 		row++;
 	}
+	return true;
 }
 
 int stringToInteger(string str){
