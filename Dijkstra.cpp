@@ -74,7 +74,7 @@ public:
 	}
 
 };
-
+void displayPath(map<Vertex, Vertex>&prev, Vertex source, Vertex v, string &path, bool includeFinal);
 void Dijkstra(Graph g, Vertex source,Vertex dest){
 	string path;
 	map<Vertex, float> dist;
@@ -124,25 +124,25 @@ void Dijkstra(Graph g, Vertex source,Vertex dest){
 				prev[neighbor] = u;
 			}	
 		}
-		cout << "Evaluate distance of remain unvisited vertexes." << endl;
-		for (Vertex v:Q)
-			cout << "Dist[" << v.vname << "] = " << dist[v] << endl;
+		if (!Q.empty())
+			cout << "Evaluate distance of remain unvisited vertexes." << endl;
+		else
+			cout << "No more vertex to evaluate."<<endl;
+		for (Vertex v : Q){
+			cout << "Dist[" << v.vname << "] = " << dist[v];
+			if (dist[v] != INFINITY)
+				cout << "\t";
+			cout << "\t";
+			cout << "path is:";
+			displayPath(prev, source, v, path,false);
+		}
 		cout << "========================"<<endl;
 	}
 
 	//Display shortest path result.
-	path = "";
 	cout <<"[Finished]" << endl;
 	cout << "Shortest path is:";
-	path = path + dest.vname + " ";
-	Vertex v = dest;
-	while (prev[v] != source){
-		path = path + prev[v].vname + " ";
-		v = prev[v];
-	}
-	path = path + prev[v].vname;
-	reverseString(path);
-	cout << path << endl;
+	displayPath(prev, source, dest, path, true);
 	cout << "Distance from " << source.vname << " to " << dest.vname << " = " << dist[dest] << endl;
 
 
@@ -225,6 +225,25 @@ void main(){
 	Dijkstra(graph, graph.find(s), graph.find(d));
 
 	infile.close();
+}
+
+//This function use for display path from source to destination.
+//Destination display depend on includeFinal.
+void displayPath(map<Vertex, Vertex>&prev, Vertex source, Vertex v, string &path, bool includeFinal){
+	path = "";
+	if (prev[v] != NULL){
+		if (includeFinal)
+			path = path + v.vname + " ";
+		while (prev[v] != source){
+			path = path + prev[v].vname + " ";
+			v = prev[v];
+		}
+		path = path + prev[v].vname;
+		reverseString(path);
+	}
+	else
+		path = "Undefined";
+	cout << path << endl;
 }
 
 
