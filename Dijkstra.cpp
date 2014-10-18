@@ -6,8 +6,6 @@
 #include<stack>
 #include<map>
 #include<cmath>
-//Things to do
-//1.String as node name.
 
 using namespace std;
 //Convert string to integer by use inputstream to convert.
@@ -60,10 +58,10 @@ private:
 	vector<Edge> edge;
 public:
 	vector<Vertex> vertex;
-	Vertex find(string vertexname){
-		for (Vertex x : vertex){
-			if (x.vname == vertexname)
-				return x;
+	Vertex find(string vertexName){
+		for (Vertex v : vertex){
+			if (v.vname == vertexName)
+				return v;
 		}
 		return NULL;
 	}
@@ -73,7 +71,7 @@ public:
 			if ((e.source == u && e.dest == v) || (e.source == v && e.dest == u))
 				return e.dist;
 		}
-		return NULL;
+		return 0;
 	}
 	bool addEdge(Edge edgeToAdd){
 		for (Edge e : edge){
@@ -89,6 +87,18 @@ public:
 		}
 		edge.push_back(edgeToAdd);
 		return true;
+	}
+
+	//This member function represent graph as adjacency matrix
+	void display(){
+		for (Vertex v : vertex)
+			cout << v.vname << " ";
+		cout << endl;
+		for (int i = 0; i < vertex.size(); i++){
+			for (int j = 0; j < vertex.size(); j++)
+				cout << length(vertex[i],vertex[j]) << " ";
+			cout << endl;
+		}
 	}
 };
 bool initialized(string &filename,Graph &graph);
@@ -173,36 +183,22 @@ int main(){
 	cout << "[Member]" << endl;
 	cout << "1.Maturose Kappako\t55010977" << endl;
 	cout << "2.Suratchanan Kraidech\t55011362" << endl << endl;
-	cout << "input .csv file path(or only filename if stay at same location of program";
-	cout << endl <<"that contain graph adjacency matrix representation:" << endl;
+	cout << "Please input .csv file path(or only filename if stay at same location of";
+	cout << endl <<"program that contain graph adjacency matrix representation:" << endl;
 	getline(cin, filename);
 	//Initialized graph from adjacency matrix file.
 	//If initialized is false program will terminate here.
 	if (!initialized(filename,graph)){
 		return 0;
 	}
-
-	/*for (vector<Vertex>::iterator it = graph.vertex.begin(); it != graph.vertex.end(); it++)
-		cout << (*it).vname << ' ';
-	cout << endl;
-
-	for (Vertex v : graph.vertex){
-		cout << "Adjacent of " << v.vname << " is ";
-		for (Vertex u : v.adjacent)
-			cout << u.vname << " ";
-		cout << endl<<endl;
-	}
-
-	for (Edge path : graph.edge){
-		cout << "Source:" << path.source.vname << endl;
-		cout << "Dest:" << path.dest.vname << endl;
-		cout << "Weight:" << path.dist << endl;
-		cout << "==========================" << endl;
-	}*/
 	if (!isValidGraph(graph)){
 		cout << "This graph is invaild,please use proper adjacency matrix to represent!!!" << endl;
 	}
 	else{
+		//Display the inputed graph as adjacency matrix.
+		cout << "The graph is" << endl;
+		graph.display();
+		cout << endl<<endl;
 		while (true)
 		{
 			cout << "Enter source vertex:";
