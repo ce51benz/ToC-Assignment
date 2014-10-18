@@ -3,6 +3,7 @@
 #include<sstream>
 #include<string>
 #include<vector>
+#include<stack>
 #include<map>
 #include<cmath>
 //Things to do
@@ -11,7 +12,6 @@
 using namespace std;
 //Convert string to integer by use inputstream to convert.
 int stringToInteger(string str);
-void reverseString(string &str);
 class Vertex{
 public:
 	string vname;
@@ -20,7 +20,7 @@ public:
 	}
 
 	//Use for trigger NULL instantiation.
-	Vertex(char* ch){
+	Vertex(char* str){
 		vname = "";
 	}
 	Vertex(){
@@ -56,9 +56,10 @@ public:
 };
 
 class Graph{
+private:
+	vector<Edge> edge;
 public:
 	vector<Vertex> vertex;
-	vector<Edge> edge;
 	Vertex find(string vertexname){
 		for (Vertex x : vertex){
 			if (x.vname == vertexname)
@@ -90,7 +91,7 @@ public:
 		return true;
 	}
 };
-bool initialized(Graph &graph);
+bool initialized(string &filename,Graph &graph);
 bool isValidGraph(Graph &graph);
 void displayPath(map<Vertex, Vertex>&prev, Vertex source, Vertex v, string &path, bool includeFinal);
 void Dijkstra(Graph g, Vertex source,Vertex dest){
@@ -166,16 +167,18 @@ void Dijkstra(Graph g, Vertex source,Vertex dest){
 
 
 int main(){
-	string str1,str2;
+	string str1,str2,filename;
 	Graph graph;
 	cout << "KMITL TOC1/2557 Assignment 1 Dijkstra's Algorithm" << endl;
 	cout << "[Member]" << endl;
 	cout << "1.Maturose Kappako\t55010977" << endl;
 	cout << "2.Suratchanan Kraidech\t55011362" << endl << endl;
-	
+	cout << "input .csv file path(or only filename if stay at same location of program";
+	cout << endl <<"that contain graph adjacency matrix representation:" << endl;
+	getline(cin, filename);
 	//Initialized graph from adjacency matrix file.
 	//If initialized is false program will terminate here.
-	if (!initialized(graph)){
+	if (!initialized(filename,graph)){
 		return 0;
 	}
 
@@ -220,16 +223,19 @@ int main(){
 //This function use for display path from source to destination.
 //Destination display depend on includeFinal.
 void displayPath(map<Vertex, Vertex>&prev, Vertex source, Vertex v, string &path, bool includeFinal){
+	stack<string> st;
 	path = "";
 	if (prev[v] != NULL){
 		if (includeFinal)
-			path = path + v.vname + " ";
-		while (prev[v] != source){
-			path = path + prev[v].vname + " ";
+			st.push(v.vname);
+		while (v != source){
+			st.push(prev[v].vname);
 			v = prev[v];
 		}
-		path = path + prev[v].vname;
-		reverseString(path);
+		while (!st.empty()){
+			path = path + st.top() + ' ';
+			st.pop();
+		}
 	}
 	else
 		path = "Undefined";
@@ -247,13 +253,13 @@ bool isValidGraph(Graph &graph){
 }
 
 //Initialized graph from adjacency matrix file.
-bool initialized(Graph &graph){
+bool initialized(string &filename,Graph &graph){
 	int row = 0, col, weight;
 	ifstream infile;
 	string str, input;
 	int shift;
 	infile.close();
-	infile.open("graphTOC.csv");
+	infile.open(filename);
 	if (infile.fail()){
 		cerr << "Fail to open file."<<endl;
 		return false;
@@ -334,13 +340,4 @@ int stringToInteger(string str){
 		throw exception();
 	}
 	return value;
-}
-
-void reverseString(string &str){
-	string reverse = "";
-	if (str != ""){
-		for (int i = str.length() - 1; i >= 0; i--)
-			reverse = reverse + str[i];
-	}
-	str = reverse;
 }
