@@ -5,11 +5,8 @@
 #include<vector>
 #include<map>
 #include<cmath>
-
 //Things to do
-//1.Detect not graph creation.
-//2.Detect error from read file
-//3.Multi weight read value
+//1.String as node name.
 
 using namespace std;
 //Convert string to integer by use inputstream to convert.
@@ -17,12 +14,17 @@ int stringToInteger(string str);
 void reverseString(string &str);
 class Vertex{
 public:
-	char vname;
-	Vertex(char ch){
-		vname = ch;
+	string vname;
+	Vertex(string str){
+		vname = str;
+	}
+
+	//Use for trigger NULL instantiation.
+	Vertex(char* ch){
+		vname = "";
 	}
 	Vertex(){
-		vname = ' ';
+		vname = "";
 	}
 
 	vector<Vertex> adjacent;
@@ -57,7 +59,7 @@ class Graph{
 public:
 	vector<Vertex> vertex;
 	vector<Edge> edge;
-	Vertex find(char vertexname){
+	Vertex find(string vertexname){
 		for (Vertex x : vertex){
 			if (x.vname == vertexname)
 				return x;
@@ -164,7 +166,7 @@ void Dijkstra(Graph g, Vertex source,Vertex dest){
 
 
 int main(){
-	char s,d;
+	string str1,str2;
 	Graph graph;
 	cout << "KMITL TOC1/2557 Assignment 1 Dijkstra's Algorithm" << endl;
 	cout << "[Member]" << endl;
@@ -201,16 +203,16 @@ int main(){
 		while (true)
 		{
 			cout << "Enter source vertex:";
-			cin >> s;
+			cin >> str1;
 			cout << "Enter destination vertex:";
-			cin >> d;
-			if (graph.find(s) == NULL || graph.find(d) == NULL)
-				cerr << "Input vertex incorrect,please try again.";
+			cin >> str2;
+			if (graph.find(str1) == NULL || graph.find(str2) == NULL)
+				cerr << "Input vertex incorrect,please try again."<<endl;
 			else
 				break;
 		}
 		cout << endl;
-		Dijkstra(graph, graph.find(s), graph.find(d));
+		Dijkstra(graph, graph.find(str1), graph.find(str2));
 	}
 	return 0;
 }
@@ -260,11 +262,22 @@ bool initialized(Graph &graph){
 	//Read first line to create vertex and add it to graph.
 	if (!infile.eof()){
 		infile >> str;
-		for (int i = 0; i < str.length(); i++){
+		int i = 0;
+		while (i < str.length()){
+			shift = 1;
 			if (!ispunct(str[i])){
-				Vertex r(str[i]);
+				int j = i + 1;
+				while (j < str.length()){
+					if (!ispunct(str[j])){
+						shift++; j++;
+					}
+					else
+						break;
+				}
+				Vertex r(str.substr(i,shift));
 				graph.vertex.push_back(r);
 			}
+			i += shift;
 		}
 	}
 	//Read file and initialize graph.
