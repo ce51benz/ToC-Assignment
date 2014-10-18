@@ -286,7 +286,12 @@ bool initialized(Graph &graph){
 						break;
 				}
 				input = input + str.substr(i, shift);
-				weight = stringToInteger(input);
+				try{
+					weight = stringToInteger(input);
+				}
+				catch (exception ex){
+					return false;
+				}
 				//If weight is not zero create edge and add it to graph.
 				//Also add adjacent vertex to source vertex.
 				if (weight > 0){
@@ -312,8 +317,8 @@ int stringToInteger(string str){
 	int value;
 	stream >> value;
 	if (stream.fail() || !stream.eof()){
-		cout << "error!!!" << endl;
-		return NULL;
+		cout << "Input string error!!!" << endl;
+		throw exception();
 	}
 	return value;
 }
