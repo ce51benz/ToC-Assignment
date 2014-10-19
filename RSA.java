@@ -47,7 +47,24 @@ public class RSA {
 		System.out.println(n);
 		System.out.print("phi_n = ");
 		System.out.println(phi_n);
-		}
+		
+		BigInteger d;
+		BigInteger i = BigInteger.ONE;
+		while(true){
+			if(phi_n.multiply(i).add(BigInteger.ONE).mod(E).
+					compareTo(BigInteger.ZERO) == 0){
+				d = phi_n.multiply(i).add(BigInteger.ONE).divide(E);
+			break;	
+			}
+			i = i.add(BigInteger.ONE);
+		}		
+		System.out.print("d = ");
+		System.out.println(d);
+		System.out.print("i = ");
+		System.out.println(i);
+		System.out.print("e x d mod phi_n = ");
+		System.out.println((E.multiply(d).mod(phi_n).compareTo(BigInteger.ONE) == 0));
 	}
+}
 
 
