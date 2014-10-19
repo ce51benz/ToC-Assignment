@@ -60,10 +60,17 @@ public class RSA {
 		}		
 		System.out.print("d = ");
 		System.out.println(d);
-		System.out.print("i = ");
-		System.out.println(i);
-		System.out.print("e x d mod phi_n = ");
-		System.out.println((E.multiply(d).mod(phi_n).compareTo(BigInteger.ONE) == 0));
+		System.out.print("Private key = (");
+		System.out.print(n);
+		System.out.print(",");
+		System.out.print(d);
+		System.out.println(")");
+		System.out.print("Public key = (");
+		System.out.print(n);
+		System.out.print(",");
+		System.out.print(E);
+		System.out.println(")");
+		//System.out.println((E.multiply(d).mod(phi_n).compareTo(BigInteger.ONE) == 0));
 	}
 }
 
