@@ -6,7 +6,6 @@
 #include<stack>
 #include<map>
 #include<cmath>
-
 using namespace std;
 //Convert string to integer by use inputstream to convert.
 int stringToInteger(string str);
@@ -41,6 +40,7 @@ public:
 			adjacent.push_back(newvt);
 	}
 
+	//Overload this operator to support custom Map class
 	bool operator<(Vertex v)const{
 		return vname < v.vname;
 	}
@@ -171,7 +171,10 @@ void Dijkstra(Graph g, Vertex source,Vertex dest){
 	//Display shortest path result.
 	cout <<"[Finished]" << endl;
 	cout << "Shortest path is:";
-	displayPath(prev, source, dest, path, true);
+	if (source == dest)
+		cout << source.vname << endl;
+	else
+		displayPath(prev, source, dest, path, true);
 	cout << "Distance from " << source.vname << " to " << dest.vname << " = " << dist[dest] << endl;
 }
 
